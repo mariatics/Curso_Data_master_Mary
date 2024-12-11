@@ -1,36 +1,46 @@
 from Node import Node
 
 import logging
-# Configuración del módulo logging
+
 
 class Stack:
-    def __init__(self):
-        # Inicializa la pila vacía
+    def __init__(self, limit=1000):
         self.top_item = None
-        logging.warning("Inicializando la pila.")
+        self.size = 0
+        self.limit = limit
+        logging.warning("Inicializando la pila con límite de {} elementos.".format(limit))
 
     def peek(self):
-        # Verifica si el elemento superior existe
-        if self.top_item:
+        if not self.is_empty():
             logging.warning("Obteniendo el valor del elemento superior.")
             return self.top_item.get_value()
         else:
-            logging.warning("La pila está vacía. Lanzando AttributeError.")
-            raise AttributeError("No se puede hacer peek en una pila vacía.")
+            logging.warning("La pila esta totalmente vacia!")
+            return None
 
     def push(self, value):
-        # Crea un nuevo nodo con el valor proporcionado
-        logging.warning(f"Agregando valor {value} a la pila.")
-        item = Node(value)  # Crea un nodo con el valor dado
-        item.set_next_node(self.top_item)  # Conecta el nuevo nodo con el nodo superior actual
-        self.top_item = item  # Establece el nuevo nodo como el nodo superior
+        if self.has_space():
+            logging.warning(f"Agregando valor {value} a la pila.")
+            item = Node(value)
+            item.set_next_node(self.top_item)
+            self.top_item = item
+            self.size += 1
+        else:
+            logging.warning("La pila esta llena ¡No queda espacio!")
 
     def pop(self):
-        # Elimina el nodo superior y devuelve su valor
-        if self.top_item is None:
-            logging.warning("Intentando eliminar de una pila vacía. Lanzando AttributeError.")
-            raise AttributeError("No se puede hacer pop en una pila vacía.")
-        item_to_remove = self.top_item  # Guarda el nodo superior
-        self.top_item = item_to_remove.get_next_node()  # Actualiza el nodo superior
-        logging.warning(f"Eliminando el valor {item_to_remove.get_value()} de la pila.")
-        return item_to_remove.get_value()  # Devuelve el valor del nodo eliminado
+        if not self.is_empty():
+            item_to_remove = self.top_item
+            self.top_item = item_to_remove.get_next_node()
+            self.size -= 1
+            logging.warning(f"Eliminando el valor {item_to_remove.get_value()} de la pila.")
+            return item_to_remove.get_value()
+        else:
+            logging.warning("La pila esta totalmente vacia!")
+            return None
+
+    def has_space(self):
+        return self.size < self.limit
+
+    def is_empty(self):
+        return self.size == 0
